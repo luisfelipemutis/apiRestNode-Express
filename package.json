@@ -1,5 +1,5 @@
 {
-  "name": "miapi",
+  "name": "node-express-learning-api",
   "version": "1.0.0",
   "description": "mi primer api",
   "main": "app.js",

@@ -1,16 +1,22 @@
 require('dotenv').config();
+// Express app setup
 const express = require('express');
 const app = express();
-const bodyParser = require('body-parser');
+
+// File system and path setup for user data
 const fs = require('fs'); /* para leer archivos */
 const path = require('path'); /* para la ruta de archivos*/
 const userFindPath = path.join(__dirname, 'users.json'); /* ruta del archivo json */
+
+const bodyParser = require('body-parser'); /* para parsear el cuerpo de las solicitudes */
+
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true })); /* uso de formularios */
+
+// Server configuration and middleware setup
 const PORT = process.env.PORT || 3000;
 const { userValido } = require("./functions/validaciones.js");
-
-const { LoggerMiddleware } = require("./middlewares/loggers.js")
+const { LoggerMiddleware } = require("./middlewares/loggers.js") // Registro de logs de las solicitudes
 const { errorHandle } = require("./middlewares/errorHandle.js")
 
 // se adicona el middle y handler para manejo de error.
@@ -19,9 +25,9 @@ app.use(errorHandle);
 
 app.get('/', (req, res) => {
     res.send(`
-        <h1>Hola a mi API </h1>
-        <h2> Esta API esta creada con Express</h2>
-        <p> Este es mi primer proyecto con Express</p>`
+        <h1>Welcome to API Node.js - Express</h1>
+        <h2>API is made with Express</h2>
+        <p>Project with Express</p>`
     );
 });
 
@@ -29,6 +35,7 @@ app.get('/users/:id', (req, res) => {
     const id = req.params.id;
     res.send(`El usuario es: ${id}`);
 });
+
 app.get('/search', (req, res) => {
     const terms = req.query.termino || 'No especificado';
     const categoria = req.query.categoria || 'Todas';
@@ -38,6 +45,7 @@ app.get('/search', (req, res) => {
         <p> Categoría: ${categoria}</p>`
     );
 });
+
 app.post('/form', (req, res) => {
     const nombre = req.body.nombre || 'Anónimo';
     const email = req.body.email || 'No especificado';
@@ -67,11 +75,13 @@ app.get('/users', (req, res) => {
         res.json(users);
     })
 });
+
 app.post('/users', (req, res) => {
     const newUser = req.body;
     if (!newUser || !newUser.name || !newUser.email) {
         return res.status(400).json({ error: "Faltan datos del usuario" });
     }
+
     fs.readFile(userFindPath, 'utf-8', (err, data) => {
         if (err) {
             return res.status(500).json({ error: 'Error al leer archivo' })
@@ -92,6 +102,7 @@ app.post('/users', (req, res) => {
         });
     });
 });
+
 app.put('/users/:id', (req, res) => {
     const userId = parseInt(req.params.id, 10);
     const updatedUser = req.body;
@@ -116,7 +127,6 @@ app.put('/users/:id', (req, res) => {
     });
 });
 
-
 app.delete('/users/:id', (req, res) => {
     const userId = parseInt(req.params.id, 10);
     fs.readFile(userFindPath, 'utf-8', (err, data) => {
@@ -132,7 +142,7 @@ app.delete('/users/:id', (req, res) => {
             res.json({ message: "Usuario eliminado correctamente" });
         });
     });
-})
+});
 
 app.get('/error', (req, res, next) => {
     next(new Error('Error de prueba...'))

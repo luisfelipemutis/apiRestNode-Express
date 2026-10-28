@@ -1,168 +1,119 @@
-# API REST Rick and Morty
+# Proyecto de aprendizaje: Node.js y Express
 
-Este proyecto es una API REST de aprendizaje construida con Node.js y Express. Está pensada como una explicación práctica de conceptos básicos y medios del desarrollo backend: rutas, parámetros, middlewares, validación, manejo de errores y persistencia simple en archivos JSON.
+Este repositorio es un proyecto educativo para practicar cómo crear un servidor web y una API REST con Node.js y Express. Incluye ejemplos de rutas HTTP, lectura de parámetros, recepción de formularios y JSON, middleware, validación y operaciones CRUD sencillas sobre un archivo JSON.
 
-## ¿Qué contiene el proyecto?
+## Tecnologías y herramientas
 
-La estructura principal es la siguiente:
+- **Node.js**: entorno que permite ejecutar JavaScript fuera del navegador. En este proyecto ejecuta el servidor y proporciona módulos integrados para trabajar con archivos y rutas del sistema.
+- **Express 5**: framework web para Node.js. Se utiliza para crear el servidor, definir endpoints, leer parámetros de las solicitudes y enviar respuestas HTTP.
+- **JavaScript con CommonJS**: el código del servidor usa `require()` para importar módulos y `module.exports` para compartir funciones entre archivos.
+- **`body-parser`**: middleware que interpreta cuerpos de solicitudes JSON y datos de formularios URL-encoded para que las rutas puedan leerlos desde `req.body`.
+- **`dotenv`**: carga variables definidas en un archivo `.env` a `process.env`. La aplicación usa `PORT` si está definido; de lo contrario, escucha en el puerto `3000`. El archivo `.env` es opcional y no se incluye una plantilla en el repositorio.
+- **Módulos integrados de Node.js (`fs` y `path`)**: `fs` lee y escribe el archivo de usuarios; `path` construye la ruta a `users.json` de forma compatible con el sistema operativo.
+- **Archivo JSON (`users.json`)**: almacenamiento local de ejemplo para practicar operaciones de lectura y escritura. No es una base de datos y no ofrece las garantías de concurrencia, integridad o escalabilidad.
+- **HTML (`index.html`) y CSS (`style.css`)**: demostración independiente de tarjetas de producto adaptables. El CSS utiliza *Container Queries* para cambiar la disposición según el ancho del contenedor. Esta página no está conectada a la API ni se sirve desde Express; se puede abrir directamente en el navegador.
+- **npm**: gestor de paquetes que instala las dependencias y ejecuta los scripts definidos en `package.json`.
 
-- `apiRest/app.js`: archivo principal donde se crea el servidor Express, se registran los middlewares y se definen las rutas.
-- `apiRest/users.json`: archivo que funciona como una base de datos simple para guardar usuarios.
-- `apiRest/functions/validaciones.js`: contiene funciones para validar datos de usuarios.
-- `apiRest/middlewares/loggers.js`: middleware que registra cada petición y su tiempo de respuesta.
-- `apiRest/middlewares/errorHandle.js`: middleware para manejar errores de forma centralizada.
-- `apiRest/index.html` y `apiRest/style.css`: demostración aparte de CSS moderno con container queries. No forman parte de la API, pero sí del material de práctica.
-- `apiRest/.env` y `apiRest/.env-example`: archivos para configurar variables de entorno, como el puerto del servidor.
+## Estructura del proyecto
 
-## ¿Cómo funciona?
-
-1. El servidor se inicia desde `apiRest/app.js`.
-2. Express recibe las peticiones HTTP.
-3. `body-parser` permite leer datos enviados en JSON o formularios.
-4. `LoggerMiddleware` registra cada petición que entra.
-5. Las rutas responden según el método HTTP y la URL.
-6. Para las rutas de usuarios, el servidor lee y escribe en `users.json` usando `fs`.
-7. `userValido` verifica que los datos enviados tengan formato correcto.
-8. `errorHandle` centraliza la respuesta cuando ocurre un error.
-
-## Cómo ejecutar el proyecto
-
-1. Entra en la carpeta del proyecto:
-
-```bash
-cd apiRest
+```text
+.
+├── app.js
+├── functions/
+│   └── validaciones.js
+├── middlewares/
+│   ├── errorHandle.js
+│   └── loggers.js
+├── users.json
+├── index.html
+├── style.css
+└── package.json
 ```
 
-2. Instala dependencias:
+- **`app.js`**: punto de entrada. Configura Express y los parsers, registra los middlewares y define las rutas.
+- **`functions/validaciones.js`**: exporta funciones para validar correo, nombre, identificador y datos de usuario.
+- **`middlewares/loggers.js`**: registra el método, la URL, la IP y el código de respuesta de cada solicitud, junto con su duración.
+- **`middlewares/errorHandle.js`**: define una respuesta JSON para errores y añade el stack cuando `NODE_ENV` es `development`.
+- **`users.json`**: datos iniciales de usuarios que las rutas CRUD leen y modifican.
+- **`index.html` y `style.css`**: ejemplo separado de HTML y CSS, no forma parte del servidor Express.
+- **`package.json`**: metadatos, dependencias y comandos npm del proyecto.
+
+## Requisitos y ejecución
+
+Necesitas Node.js y npm instalados. El comando de desarrollo usa `node --watch`, disponible en versiones actuales de Node.js.
 
 ```bash
 npm install
+npm run dev
 ```
 
-3. Crea un archivo `.env` en la carpeta `apiRest` si quieres definir un puerto personalizado. Puedes usar como base `.env-example`:
+El servidor muestra su dirección en la consola y, por defecto, queda disponible en `http://localhost:3000`. Para usar otro puerto, crea un archivo `.env` en la raíz:
 
 ```env
 PORT=3005
 NODE_ENV=development
 ```
 
-4. Inicia el servidor en modo normal:
+Para iniciar el servidor sin el modo de observación:
 
 ```bash
 npm start
 ```
 
-5. O ejecútalo en modo desarrollo con recarga automática:
+Los scripts están definidos en `package.json`: `npm run dev` inicia `app.js` con reinicio al detectar cambios, y `npm start` inicia `app.js` normalmente.
+
+## Rutas de ejemplo
+
+| Método | Ruta | Qué permite practicar |
+|---|---|---|
+| `GET` | `/` | Responder con contenido HTML. |
+| `GET` | `/users/:id` | Leer un parámetro de ruta (`req.params.id`). |
+| `GET` | `/search?termino=...&categoria=...` | Leer parámetros de consulta (`req.query`). |
+| `POST` | `/form` | Recibir campos de un formulario o JSON y responder en JSON. |
+| `POST` | `/api/data` | Recibir un objeto JSON; responde con `400` si el cuerpo está vacío. |
+| `GET` | `/users` | Leer y devolver la lista de `users.json`. |
+| `POST` | `/users` | Validar y añadir un usuario a `users.json`. |
+| `PUT` | `/users/:id` | Validar y actualizar un usuario. |
+| `DELETE` | `/users/:id` | Eliminar de la lista el usuario cuyo identificador coincide. |
+| `GET` | `/error` | Provocar un error para practicar el flujo de errores. |
+
+Las rutas de usuarios son una práctica de CRUD: **Create** (crear), **Read** (leer), **Update** (actualizar) y **Delete** (eliminar). Por ejemplo, puedes probar las lecturas con:
 
 ```bash
-npm run dev
+curl http://localhost:3000/users
+curl http://localhost:3000/users/5
+curl "http://localhost:3000/search?termino=node&categoria=backend"
 ```
 
-Por defecto la app escucha en `http://localhost:3000`, salvo que definas `PORT` en el archivo `.env`.
+Para crear un usuario, envía JSON con los campos que actualmente requieren las validaciones (`name`, `nombre`, `email` e `id`):
 
-## Endpoints existentes
+```bash
+curl.exe -X POST http://localhost:3000/users -H "Content-Type: application/json" -d '{"id":6,"name":"Ana","nombre":"Ana Pérez","email":"ana@example.com"}'
+```
 
-### `GET /`
+En PowerShell, `curl.exe` evita la colisión con el alias `curl` de `Invoke-WebRequest`. También puedes usar una herramienta como Postman o Insomnia para enviar solicitudes.
 
-Devuelve un mensaje HTML de bienvenida.
+## Conceptos que puedes aprender
 
-### `GET /users/:id`
+1. **Servidor y API REST**: el servidor recibe solicitudes HTTP y responde a través de rutas organizadas por recursos y métodos.
+2. **Métodos HTTP**: `GET` consulta, `POST` crea o envía datos, `PUT` actualiza y `DELETE` elimina.
+3. **Parámetros de ruta y de consulta**: `:id` en `/users/:id` es un parámetro de ruta; `termino` y `categoria` después de `?` son parámetros de consulta.
+4. **Cuerpo de una solicitud**: `req.body` contiene los datos enviados en JSON o en un formulario, una vez interpretados por los parsers.
+5. **Middleware**: una función como `LoggerMiddleware` puede observar solicitudes y respuestas antes o después de ejecutar la ruta.
+6. **Validación**: las funciones de `validaciones.js` comprueban campos antes de guardar o actualizar usuarios.
+7. **Errores HTTP**: las rutas pueden responder con códigos como `400` o `500`; `errorHandle.js` muestra una forma de centralizar las respuestas de error.
+8. **Persistencia**: `fs` permite leer y escribir datos, aunque en una aplicación real normalmente se usaría una base de datos.
+9. **Configuración**: `dotenv` permite cambiar el puerto con variables de entorno sin modificar el código.
+10. **Diseño adaptable**: `style.css` muestra cómo las *Container Queries* adaptan una tarjeta según el espacio disponible.
 
-Recibe un parámetro de ruta `id` y lo devuelve en la respuesta.
+## Límites actuales del ejemplo
 
-### `GET /search?termino=...&categoria=...`
+- La API es para aprendizaje: guardar JSON directamente no es adecuado para producción ni para varias escrituras simultáneas.
+- La validación de creación comprueba `name` en la ruta y `nombre` en el validador; por eso actualmente se necesitan ambos campos.
+- El middleware de errores está registrado antes de las rutas. En Express, para manejar errores que se propaguen desde las rutas, normalmente se registra después de ellas.
+- El script `test` de `package.json` es solo un marcador y no ejecuta pruebas automatizadas todavía.
+- La página HTML/CSS es independiente de la API y su imagen de producto requiere conexión a Internet.
 
-Lee parámetros de consulta (`query`). Si no se envían, usa valores por defecto.
+## Propósito
 
-### `POST /form`
-
-Recibe datos de formulario con `nombre` y `email`.
-
-### `POST /api/data`
-
-Recibe un objeto JSON arbitrario en el cuerpo de la petición.
-
-### `GET /users`
-
-Lee todos los usuarios guardados en `users.json` y los devuelve en formato JSON.
-
-### `POST /users`
-
-Crea un usuario nuevo. Valida que existan `name`, `email`, `nombre` e `id` según la lógica actual del proyecto.
-
-### `PUT /users/:id`
-
-Actualiza un usuario existente por su `id`.
-
-### `DELETE /users/:id`
-
-Elimina un usuario por su `id`.
-
-### `GET /error`
-
-Genera un error de prueba para comprobar el middleware de manejo de errores.
-
-## Conceptos que enseña este proyecto
-
-### 1. Node.js
-
-Es el entorno que permite ejecutar JavaScript en el servidor.
-
-### 2. Express
-
-Es el framework que simplifica la creación de servidores web y APIs REST.
-
-### 3. Rutas HTTP
-
-Son los caminos que responde la API, por ejemplo `GET /users` o `POST /users`.
-
-### 4. Métodos HTTP
-
-El proyecto usa principalmente:
-
-- `GET` para consultar información.
-- `POST` para crear datos.
-- `PUT` para actualizar datos.
-- `DELETE` para eliminar datos.
-
-### 5. Parámetros de ruta
-
-Son valores que viajan dentro de la URL, por ejemplo `:id` en `/users/:id`.
-
-### 6. Query params
-
-Son parámetros que viajan después del signo `?`, por ejemplo `?termino=hola`.
-
-### 7. Body de la petición
-
-Es la información que se envía dentro de una solicitud `POST` o `PUT`, normalmente en JSON o formulario.
-
-### 8. Middlewares
-
-Son funciones que se ejecutan antes de llegar a la ruta final. Aquí se usan para registrar peticiones y manejar errores.
-
-### 9. Validación de datos
-
-Permite comprobar que los datos recibidos tengan el formato esperado antes de guardarlos.
-
-### 10. Manejo de errores
-
-Sirve para responder de forma controlada cuando algo falla, en lugar de dejar que el servidor se rompa.
-
-### 11. Variables de entorno
-
-Se usan para configurar datos como el puerto sin escribirlos directamente en el código.
-
-### 12. Persistencia con archivos JSON
-
-En vez de usar una base de datos real, este proyecto guarda la información en un archivo `.json`.
-
-## Observaciones importantes
-
-- Este proyecto es principalmente educativo.
-- La lógica de usuarios es útil para aprender CRUD, pero todavía no usa base de datos.
-- El archivo `index.html` con `style.css` es una demostración aparte de frontend y CSS avanzado.
-
-## Resumen
-
-Este proyecto sirve para aprender cómo se construye una API REST básica con Express, cómo se organizan sus partes y cómo se conectan rutas, validaciones, middlewares y archivos JSON en un flujo simple y entendible.
+El objetivo es aprender, mediante ejemplos pequeños, cómo iniciar un proyecto de Node.js con Express y cómo se relacionan rutas, solicitudes HTTP, middleware, validación y persistencia básica. La estructura y las implementaciones pueden ampliarse gradualmente con pruebas, una base de datos y validaciones más completas.
